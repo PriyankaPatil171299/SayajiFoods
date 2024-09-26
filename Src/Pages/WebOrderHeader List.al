@@ -4,6 +4,7 @@ page 60000 "WebOrderHeader List"
     Caption = 'Web Order Header List';
     SourceTable = "Web Order Header";
     ApplicationArea = all;
+    UsageCategory = Lists;
 
     layout
     {

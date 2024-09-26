@@ -5,6 +5,7 @@ page 60002 "Web Order Line List"
     PageType = List;
     SourceTable = "Web Order Line";
     ApplicationArea = All;
+    UsageCategory = Lists;
     layout
     {
         area(Content)
