@@ -10,7 +10,14 @@
   "help": "",
   "url": "",
   "logo": "",
-  "dependencies": [],
+  "dependencies": [
+    {
+      "name": "India GST",
+      "version": "20.1.39764.39901",
+      "publisher": "Microsoft",
+      "id": "db643212-b7fb-4dd4-b5a8-cb44ac714461" 
+    }
+  ],
   "screenshots": [],
   "platform": "1.0.0.0",
   "application": "24.0.0.0",

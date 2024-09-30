@@ -1,4 +1,4 @@
-tableextension 50003 "Sales Header" extends "Sales Header"
+tableextension 60002 "Sales Header" extends "Sales Header"
 {
     fields
     {
@@ -137,17 +137,80 @@ tableextension 50003 "Sales Header" extends "Sales Header"
             Editable = false;
 
         }
-    }
+        field(50014; "PP No"; Text[50])
+        {
+            DataClassification = ToBeClassified;
+            //TableRelation = "Backward Working"."P.P. No."; //psp
+        }
+        field(50015; "Price Type"; Option)
+        {
+            DataClassification = ToBeClassified;
+            OptionCaption = ' ,List Price,Special Price ';
+            OptionMembers = " ","List Price","Special Price ";
 
-    keys
-    {
-        // Add changes to keys here
-    }
+            trigger OnValidate()
+            var
+                SalesLine: Record "Sales Line";
+            begin
+                IF xRec."Price Type" <> "Price Type" THEN BEGIN
+                    SalesLine.RESET;
+                    SalesLine.SETRANGE(SalesLine."Document Type", "Document Type");
+                    SalesLine.SETRANGE(SalesLine."Document No.", "No.");
+                    IF SalesLine.FINDSET THEN
+                        REPEAT
+                            // SalesLine."PP Header No." := '';
+                            // SalesLine."PP Special Price" := FALSE;  //psp
+                            // SalesLine."PP Line No." := 0;
+                            SalesLine.VALIDATE(SalesLine."Unit Price", 0);
+                            SalesLine.MODIFY;
+                        UNTIL SalesLine.NEXT = 0;
+                END;
+            end;
+        }
+        field(50016; "Flooring Customer Type"; Option)
+        {
+            DataClassification = ToBeClassified;
+            OptionCaption = 'ARIC,Dealer,Distributor,Direct,Stockist,Project Distributor,Not Active,Sole Distributor,CP,DP,LFCP,LFDP,DC';
+            OptionMembers = ARIC,Dealer,Distributor,Direct,Stockist,"Project Distributor","Not Active","Sole Distributor",CP,DP,LFCP,LFDP,DC;
+        }
+        field(50017; "Total Order Cubage"; Decimal)
+        {
+            DataClassification = ToBeClassified;
+        }
+        field(50018; "Total Order Weight"; Decimal)
+        {
+            DataClassification = ToBeClassified;
+        }
+        field(50019; Link; Code[20])
+        {
+            DataClassification = ToBeClassified;
+            Editable = false;
+            Enabled = true;
+            //TableRelation = "Vehicle Master"; //psp
+        }
+        field(50020; "Transit Document"; Boolean)
+        {
+            DataClassification = ToBeClassified;
 
-    fieldgroups
-    {
-        // Add changes to field groups here
+        }
+        // field(50021; "Location State Code"; Code[10])
+        // {
+        //     Caption = 'Location State Code';
+        //     Editable = false;
+        //     //TableRelation = State; //psp
+        // }
     }
+    procedure CalcInvDiscForHeader()
+    var
+        SalesInvDisc: Codeunit "60";
+    begin
+        SalesSetup.GET;
+        IF SalesSetup."Calc. Inv. Discount" THEN
+            SalesInvDisc.CalculateIncDiscForHeader(Rec);
+    end;
+
+
+
 
     var
         SaleslINE_rEC: Record "Sales Line";
