@@ -1,4 +1,4 @@
-pageextension 60002 "Blanket Sales Order" extends "Blanket Sales Order"
+pageextension 60002 "Blanket_Sales Order" extends "Blanket Sales Order"
 {
     layout
     {
@@ -86,14 +86,14 @@ pageextension 60002 "Blanket Sales Order" extends "Blanket Sales Order"
         {
             Editable = false;
         }
-        // modify("GST Bill-to State Code")
-        // {
-        //     Editable = false;
-        // }
-        // modify("GST Ship-to State Code")  //psp dependcies need
-        // {
-        //     Editable = false;
-        // }
+        modify("GST Bill-to State Code")
+        {
+            Editable = false;
+        }
+        modify("GST Ship-to State Code")
+        {
+            Editable = false;
+        }
 
 
 
@@ -154,43 +154,48 @@ pageextension 60002 "Blanket Sales Order" extends "Blanket Sales Order"
     }
     actions
     {
-        //modify(Statistics)
-        //{
-        // trigger OnBeforeAction()
-        // begin
-        //         CalcInvDiscForHeader;
-        //             SalesSetup.GET;
-        //             CALCFIELDS("Price Inclusive of Taxes");
-        //             IF SalesSetup."Calc. Inv. Discount" AND (NOT "Price Inclusive of Taxes") THEN BEGIN
-        //               CalcInvDiscForHeader;
-        //               COMMIT
-        //             END;
-        //             IF "Price Inclusive of Taxes" THEN BEGIN
-        //               SalesLine.InitStrOrdDetail(Rec);
-        //               SalesLine.GetSalesPriceExclusiveTaxes(Rec);
-        //               SalesLine.UpdateSalesLinesPIT(Rec);
-        //               COMMIT;
-        //             END;
+        modify(Statistics)
+        {
+            trigger OnBeforeAction()
+            var
+                SalesHeader: Record "Sales Header";
+                SalesSetup: Record "Sales & Receivables Setup";
+                SalesLine: Record "Sales Line";
+            begin
+                SalesHeader.CalcInvDiscForHeader;
+                SalesSetup.GET;
+                //CALCFIELDS("Price Inclusive of Taxes");
+                //IF SalesSetup."Calc. Inv. Discount" AND (NOT "Price Inclusive of Taxes") THEN BEGIN
+                SalesHeader.CalcInvDiscForHeader;
+                COMMIT;
+                //END;
+                // IF "Price Inclusive of Taxes" THEN BEGIN
+                SalesLine.InitStrOrdDetail(Rec);
+                SalesLine.GetSalesPriceExclusiveTaxes(Rec);
+                //SalesLine.UpdateSalesLinesPIT(Rec);
+                COMMIT;
+                //END;
 
-        //             IF Structure <> '' THEN BEGIN
-        //               SalesLine.CalculateStructures(Rec);
-        //               SalesLine.AdjustStructureAmounts(Rec);
-        //               SalesLine.UpdateSalesLines(Rec);
-        //               SalesLine.CalculateTCS(Rec);
-        //             END ELSE BEGIN
-        //               SalesLine.CalculateTCS(Rec);
-        //             END;
-        //             COMMIT;
-        //             PAGE.RUNMODAL(PAGE::"Sales Order Statistics",Rec);
-        //         end;
-        //     }
+                // IF Structure <> '' THEN BEGIN
+                SalesLine.CalculateStructures(Rec);
+                // SalesLine.AdjustStructureAmounts(Rec);
+                // SalesLine.UpdateSalesLines(Rec);
+                SalesLine.CalculateTCS(Rec);
+                //END ELSE 
+                BEGIN
+                    SalesLine.CalculateTCS(Rec);
+                END;
+                COMMIT;
+                PAGE.RUNMODAL(PAGE::"Sales Order Statistics", Rec);
+            end;
+        }
 
-        // }  //psp (pending solving error)
+    }  //psp (pending solving error)
 
 
 
 
-    }
+
 
 
 
@@ -317,6 +322,10 @@ pageextension 60002 "Blanket Sales Order" extends "Blanket Sales Order"
         UserSetUp_Rec: Record "User Setup";
         SetEditable: Boolean;
         SetEditable2: Boolean;
+        SalesHeader: Record "Sales Header";
+        SalesSetup: Record "Sales & Receivables Setup";
+        SalesLine: Record "Sales Line";
+
 
 
 }
